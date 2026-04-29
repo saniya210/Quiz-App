@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz App</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <h2>Quiz App</h2>
+    <div id="progress">Question 1/5</div>
+  </header>
+
+  <div id="quiz-box">
+    <h3 id="question"></h3>
+    <div id="options"></div>
+  </div>
+
+  <div class="footer">
+    <button id="nextBtn">Next</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
+<style>
+    body {
+  font-family: Arial;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.app {
+  background: white;
+  padding: 20px;
+  width: 350px;
+  border-radius: 10px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+#options button {
+  width: 100%;
+  margin: 5px 0;
+  padding: 10px;
+  border: none;
+  background: #eee;
+  cursor: pointer;
+  border-radius: 5px;
+  text-align: left;
+}
+
+#options button.correct {
+  background: #4caf50;
+  color: white;
+}
+
+#options button.wrong {
+  background: #f44336;
+  color: white;
+}
+
+.footer {
+  margin-top: 10px;
+  text-align: right;
+}
+
+#nextBtn {
+  padding: 8px 15px;
+  border: none;
+  background: #333;
+  color: white;
+  cursor: pointer;
+}
+</style>
+<script>
+    const quizData = [
+  {
+    question: "Which language runs in the browser?",
+    options: ["Java", "C", "Python", "JavaScript"],
+    answer: "JavaScript"
+  },
+  {
+    question: "What does CSS stand for?",
+    options: [
+      "Central Style Sheets",
+      "Cascading Style Sheets",
+      "Computer Style Sheets",
+      "Creative Style System"
+    ],
+    answer: "Cascading Style Sheets"
+  },
+  {
+    question: "Which HTML tag is used for JavaScript?",
+    options: ["<script>", "<js>", "<code>", "<javascript>"],
+    answer: "<script>"
+  },
+  {
+    question: "Which company developed JavaScript?",
+    options: ["Google", "Microsoft", "Netscape", "Apple"],
+    answer: "Netscape"
+  },
+  {
+    question: "Which symbol is used for comments in JS?",
+    options: ["//", "/* */", "#", "<!-- -->"],
+    answer: "//"
+  }
+];
+
+let current = 0;
+let score = 0;
+
+const questionEl = document.getElementById("question");
+const optionsEl = document.getElementById("options");
+const nextBtn = document.getElementById("nextBtn");
+const progressEl = document.getElementById("progress");
+
+function loadQuestion() {
+  const q = quizData[current];
+  questionEl.innerText = q.question;
+  progressEl.innerText = `Question ${current + 1}/${quizData.length}`;
+  optionsEl.innerHTML = "";
+
+  q.options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.innerText = opt;
+
+    btn.onclick = () => selectAnswer(btn, q.answer);
+    optionsEl.appendChild(btn);
+  });
+}
+
+function selectAnswer(btn, correct) {
+  const buttons = optionsEl.querySelectorAll("button");
+
+  buttons.forEach(b => b.disabled = true);
+
+  if (btn.innerText === correct) {
+    btn.classList.add("correct");
+    score++;
+  } else {
+    btn.classList.add("wrong");
+    buttons.forEach(b => {
+      if (b.innerText === correct) {
+        b.classList.add("correct");
+      }
+    });
+  }
+}
+
+nextBtn.onclick = () => {
+  current++;
+  if (current < quizData.length) {
+    loadQuestion();
+  } else {
+    showResult();
+  }
+};
+
+function showResult() {
+  document.getElementById("quiz-box").innerHTML = `
+    <h2>Your Score: ${score}/${quizData.length}</h2>
+    <button onclick="location.reload()">Restart</button>
+  `;
+  nextBtn.style.display = "none";
+}
+
+// keyboard support (1–4)
+document.addEventListener("keydown", (e) => {
+  const index = parseInt(e.key) - 1;
+  const buttons = optionsEl.querySelectorAll("button");
+  if (buttons[index]) {
+    buttons[index].click();
+  }
+});
+
+loadQuestion();
+</script>
